@@ -67,6 +67,13 @@ public class MainActivity extends ActionBarActivity {
 
     }
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putDouble(BILL_TOTAL, currentBillTotal);
+        outState.putDouble(CUSTOM_PERCENT, currentCustomPercent);
+    }
+
     //update 10, 15, 20 percent tip Edittexts.
     private void updateStandard()
     {
@@ -74,8 +81,21 @@ public class MainActivity extends ActionBarActivity {
         double tenPercentTip = currentBillTotal * 0.1;
         double tenPercentTotal = currentBillTotal + tenPercentTip;
         //updating the text in tip10edittext
-        tip10EditText.setText(String.format("0.2f",tenPercentTip));
-        total10EditText.setText(String.format("0.2f",tenPercentTotal));
+        tip10EditText.setText(String.format("%.02f",tenPercentTip));
+        total10EditText.setText(String.format("%.02f",tenPercentTotal));
+        //calculate bill total with a 15% tip.
+        double fifteenPercentTip = currentBillTotal * 0.15;
+        double fifteenPercentTotal = currentBillTotal + fifteenPercentTip;
+
+        tip15EditText.setText(String.format("%.02f", fifteenPercentTip));
+        total15EditText.setText(String.format("%.02f", fifteenPercentTotal));
+        //calculate bill total with a 20% tip
+        double twentyPercentTip = currentBillTotal * 0.2;
+        double twentyPercentTotal = twentyPercentTip + currentBillTotal;
+
+        tip20EditText.setText(String.format("%.02f",twentyPercentTip));
+        total20EditText.setText(String.format("%.02f",twentyPercentTotal));
+
 
 
     }
@@ -100,5 +120,57 @@ public class MainActivity extends ActionBarActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
+    private void updateCustom(){
+
+        customTipTextView.setText(currentCustomPercent + "%");
+        double customTipAmount = currentBillTotal * currentCustomPercent * 0.01;
+        double customTotalAmount = currentBillTotal + customTipAmount;
+        tipCustomEditText.setText(String.format("%.02f",customTipAmount));
+        totalCustomEditText.setText(String.format("%.02f", customTotalAmount));
+    }
+
+    private OnSeekBarChangeListener customSeekBarListener = new OnSeekBarChangeListener() {
+        @Override
+        public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+            currentCustomPercent = seekBar.getProgress();
+            updateCustom();
+        }
+
+        @Override
+        public void onStartTrackingTouch(SeekBar seekBar) {
+
+        }
+
+        @Override
+        public void onStopTrackingTouch(SeekBar seekBar) {
+
+        }
+    };
+
+    private TextWatcher billEditTextWatcher = new TextWatcher() {
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+        }
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+            try
+                {
+                    currentBillTotal = Double.parseDouble(s.toString());
+                }
+            catch (NumberFormatException e)
+                {
+                    currentBillTotal = 0.0;
+                }
+            updateStandard();
+            updateCustom();
+        }
+
+        @Override
+        public void afterTextChanged(Editable s) {
+        }
+    };
 
 }
